@@ -33,6 +33,8 @@ After code changes, return to `chrome://extensions` and click the reload button 
 - **Always** runs Light Reader on the current site.
 - **Never** keeps Light Reader off on the current site.
 - **Reading Background** changes the light reading surface color.
+- **Set default** saves the current preset or custom shade as the default reset target.
+- **Reset shade** restores the saved default shade.
 - **Lighten Now** temporarily lightens the current tab and does not save a rule.
 - **Always Lighten Sites** shows saved domains and lets you remove them.
 - **More Options** can refresh page detection, reset settings, open the QA guide, and show version details.
@@ -95,6 +97,7 @@ Light Reader stores settings in Chrome sync storage:
 
 - global enabled state
 - selected background/text/link colors
+- default background color
 - per-site mode rules
 
 The extension does not send data to a server and does not include analytics.

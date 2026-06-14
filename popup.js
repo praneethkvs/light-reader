@@ -19,6 +19,8 @@ const siteModeButtons = document.getElementById("siteModeButtons");
 const siteModeHint = document.getElementById("siteModeHint");
 const status = document.getElementById("status");
 const reset = document.getElementById("reset");
+const setDefaultShade = document.getElementById("setDefaultShade");
+const defaultShadeHint = document.getElementById("defaultShadeHint");
 const lightenNow = document.getElementById("lightenNow");
 const alwaysLighten = document.getElementById("alwaysLighten");
 const alwaysLightenList = document.getElementById("alwaysLightenList");
@@ -111,6 +113,22 @@ function updateLightenNowButton() {
   lightenNow.dataset.active = String(currentTabTemporary);
   lightenNow.textContent = currentTabTemporary ? "Return to Auto" : "Lighten Now";
   lightenNow.dataset.tooltip = currentTabTemporary ? "Stop temporary lightening" : "Apply temporarily without saving";
+}
+
+function shadeLabel(color) {
+  const preset = presetForColor(color);
+  return preset ? preset.label : color;
+}
+
+function updateDefaultShadeUI() {
+  const isCurrentDefault = settings.backgroundColor === settings.defaultBackgroundColor;
+  defaultShadeHint.textContent = `Default: ${shadeLabel(settings.defaultBackgroundColor)}`;
+  setDefaultShade.textContent = isCurrentDefault ? "Default saved" : "Set default";
+  setDefaultShade.dataset.active = String(isCurrentDefault);
+  setDefaultShade.dataset.tooltip = isCurrentDefault
+    ? "This shade is your default"
+    : "Use current shade when resetting";
+  reset.dataset.tooltip = `Restore ${shadeLabel(settings.defaultBackgroundColor)}`;
 }
 
 function positionTooltip(target) {
@@ -223,6 +241,7 @@ function render() {
   backgroundText.value = settings.backgroundColor;
   siteMode.value = currentSiteMode();
   updatePresetButtons();
+  updateDefaultShadeUI();
   updateSiteButton();
   updateSiteModeButtons();
   updateLightenNowButton();
@@ -269,7 +288,8 @@ function diagnosticPairs() {
     ["Enabled", settings.enabled ? "Yes" : "No"],
     ["Site mode", SITE_MODE_LABELS[mode] || mode],
     ["Temporary", currentTabTemporary ? "Yes" : "No"],
-    ["Shade", settings.backgroundColor]
+    ["Shade", settings.backgroundColor],
+    ["Default shade", settings.defaultBackgroundColor]
   ];
 }
 
@@ -468,9 +488,13 @@ lightenNow.addEventListener("click", () => {
 });
 
 reset.addEventListener("click", () => {
-  backgroundColor.value = DEFAULTS.backgroundColor;
-  backgroundText.value = DEFAULTS.backgroundColor;
-  save({ backgroundColor: DEFAULTS.backgroundColor }, render);
+  backgroundColor.value = settings.defaultBackgroundColor;
+  backgroundText.value = settings.defaultBackgroundColor;
+  save({ backgroundColor: settings.defaultBackgroundColor }, render);
+});
+
+setDefaultShade.addEventListener("click", () => {
+  save({ defaultBackgroundColor: settings.backgroundColor }, render);
 });
 
 alwaysLighten.addEventListener("click", () => {

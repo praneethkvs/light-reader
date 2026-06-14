@@ -61,7 +61,11 @@
             <input id="backgroundText" class="hex-field" type="text" value="#f8f6ef" spellcheck="false" data-tooltip="Enter a hex color" aria-label="Custom background hex color">
           </span>
         </label>
-        <button id="reset" class="reset-button" type="button" data-tooltip="Restore the default shade">Reset shade</button>
+        <div class="shade-actions">
+          <button id="setDefaultShade" class="shade-action" type="button" data-tooltip="Use current shade when resetting">Set default</button>
+          <button id="reset" class="shade-action" type="button" data-tooltip="Restore your default shade">Reset shade</button>
+        </div>
+        <p id="defaultShadeHint" class="default-shade-hint">Default: Paper</p>
       </section>
 
       <section class="action-block">
@@ -135,7 +139,7 @@
             <button class="modal-close" type="button" data-close-modal aria-label="Close">×</button>
           </div>
           <h2 id="resetTitle">Reset all settings?</h2>
-          <p class="modal-copy">This restores the default shade, clears saved site rules, and returns the current tab to Auto.</p>
+          <p class="modal-copy">This restores Paper as the default shade, clears saved site rules, and returns the current tab to Auto.</p>
           <div class="modal-actions">
             <button class="secondary-action" type="button" data-close-modal>Cancel</button>
             <button id="confirmResetAll" class="danger-action" type="button">Reset all</button>

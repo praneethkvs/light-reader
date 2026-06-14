@@ -2,6 +2,7 @@
   const DEFAULTS = Object.freeze({
     enabled: true,
     backgroundColor: "#f8f6ef",
+    defaultBackgroundColor: "#f8f6ef",
     textColor: "#111111",
     linkColor: "#0645ad",
     siteModes: {}
@@ -72,6 +73,7 @@
     return {
       enabled: stored.enabled !== false,
       backgroundColor: normalizeHex(stored.backgroundColor) || DEFAULTS.backgroundColor,
+      defaultBackgroundColor: normalizeHex(stored.defaultBackgroundColor) || DEFAULTS.defaultBackgroundColor,
       textColor: normalizeHex(stored.textColor) || DEFAULTS.textColor,
       linkColor: normalizeHex(stored.linkColor) || DEFAULTS.linkColor,
       siteModes: sanitizeSiteModes(stored.siteModes)
