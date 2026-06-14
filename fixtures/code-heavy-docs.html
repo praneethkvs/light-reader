@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Code Heavy Docs Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #0f1117;
+        color: #f3f4f6;
+        font-family: system-ui, sans-serif;
+      }
+
+      main {
+        max-width: 840px;
+        margin: 0 auto;
+        padding: 48px 24px;
+        line-height: 1.65;
+      }
+
+      pre,
+      code {
+        background: #171b24;
+        border: 1px solid #303747;
+        border-radius: 6px;
+        padding: 2px 4px;
+      }
+
+      pre {
+        overflow: auto;
+        padding: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="markdown-body">
+      <h1>Code Heavy Documentation</h1>
+      <p>This fixture should be detected as readable documentation while keeping inline code and larger code blocks legible after Light Reader applies styles.</p>
+      <p>The page uses a common markdown-style container and enough prose to distinguish it from a dashboard or form-heavy application screen.</p>
+      <pre><code>function createReaderState(settings) {
+  return {
+    enabled: settings.enabled,
+    backgroundColor: settings.backgroundColor
+  };
+}</code></pre>
+      <p>After activation, the code block should have a subtle contrasting background and visible borders, with links and prose text still readable.</p>
+    </main>
+  </body>
+</html>

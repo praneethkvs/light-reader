@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Light Reader",
+  "version": "0.3.0",
+  "description": "Softens dark pages with light text by switching the main reading area to a user-chosen light background.",
+  "permissions": ["activeTab", "storage"],
+  "action": {
+    "default_title": "Light Reader",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["light-reader-shared.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dark Dashboard Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #101113;
+        color: #f2f2f2;
+        font-family: system-ui, sans-serif;
+      }
+
+      header,
+      aside {
+        background: #181b20;
+        padding: 16px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        min-height: 100vh;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        padding: 24px;
+      }
+
+      section {
+        min-height: 160px;
+        border: 1px solid #333842;
+        border-radius: 8px;
+        padding: 16px;
+        background: #171a1f;
+      }
+
+      button {
+        margin: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>Operations Dashboard</header>
+    <div class="layout">
+      <aside>Filters, tabs, menus, and controls</aside>
+      <main>
+        <section><h2>Revenue</h2><button>Drill in</button><button>Export</button><div>$42,310</div></section>
+        <section><h2>Usage</h2><button>Daily</button><button>Weekly</button><div>128,942 events</div></section>
+        <section><h2>Alerts</h2><button>Acknowledge</button><button>Mute</button><div>3 open alerts</div></section>
+        <section><h2>Queue</h2><button>Assign</button><button>Escalate</button><div>27 pending</div></section>
+        <section><h2>Regions</h2><button>NA</button><button>EU</button><button>APAC</button></section>
+        <section><h2>Health</h2><button>Refresh</button><button>Inspect</button><div>99.95 percent</div></section>
+      </main>
+    </div>
+  </body>
+</html>

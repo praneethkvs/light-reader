@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Light Reader</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="panel">
+      <header class="hero">
+        <div class="brand">
+          <img class="brand-mark" src="assets/light-reader-mark.png" alt="">
+          <div>
+            <h1>Light Reader</h1>
+            <p class="status-line">
+              <span class="status-dot" aria-hidden="true"></span>
+              <span id="status">Checking this page...</span>
+            </p>
+          </div>
+        </div>
+        <div class="hero-actions" aria-label="Panel actions">
+          <input id="enabled" class="hero-toggle" type="checkbox" data-tooltip="Turn Light Reader on or off" aria-label="Enable Light Reader">
+          <button id="moreOptions" class="icon-button" type="button" data-tooltip="More options" aria-label="More options" aria-expanded="false" aria-controls="optionsMenu">⋮</button>
+        </div>
+      </header>
+
+      <div id="optionsMenu" class="menu-popover" hidden>
+        <button type="button" data-menu-action="refresh">Reload page detection</button>
+        <button type="button" data-menu-action="reset">Reset all settings</button>
+        <button type="button" data-menu-action="fixtures">Open QA guide</button>
+        <button type="button" data-menu-action="about">About Light Reader</button>
+      </div>
+
+      <section class="card site-card">
+        <div class="section-heading">
+          <h2>Site Mode</h2>
+        </div>
+        <select id="siteMode" aria-label="This site mode">
+          <option value="auto">Auto detect</option>
+          <option value="on">Always lighten</option>
+          <option value="off">Never lighten</option>
+        </select>
+        <div id="siteModeButtons" class="mode-grid" role="group" aria-label="This site">
+          <button type="button" data-mode="auto">Auto</button>
+          <button type="button" data-mode="on">Always</button>
+          <button type="button" data-mode="off">Never</button>
+        </div>
+        <p id="siteModeHint" class="helper-text" aria-live="polite">Auto detect dark pages.</p>
+      </section>
+
+      <section class="card background-card">
+        <div class="section-heading">
+          <h2>Reading Background</h2>
+        </div>
+        <div id="presetList" class="preset-list" aria-label="Background presets"></div>
+        <label class="custom-shade" for="backgroundText">
+          <span>Custom shade</span>
+          <span class="custom-inputs">
+            <input id="backgroundColor" type="color" value="#f8f6ef" data-tooltip="Pick custom shade" aria-label="Pick custom background color">
+            <input id="backgroundText" class="hex-field" type="text" value="#f8f6ef" spellcheck="false" data-tooltip="Enter a hex color" aria-label="Custom background hex color">
+          </span>
+        </label>
+        <button id="reset" class="reset-button" type="button" data-tooltip="Restore the default shade">Reset shade</button>
+      </section>
+
+      <section class="action-block">
+        <button id="lightenNow" class="primary-action" type="button" data-tooltip="Apply temporarily without saving">Lighten Now</button>
+        <p>Temporarily lighten this page. Does not save the site.</p>
+      </section>
+
+      <section class="card sites">
+        <div class="section-heading">
+          <h2>Always Lighten Sites</h2>
+          <button id="alwaysLighten" class="link-action" type="button" data-tooltip="Save this site to always lighten">Add current site</button>
+        </div>
+        <div id="alwaysLightenList" class="site-list"></div>
+        <span id="siteCount" class="site-count">0</span>
+      </section>
+
+      <footer>
+        <button id="howItWorks" type="button" data-tooltip="Open help">How it works</button>
+        <button id="support" type="button" data-tooltip="Contact support">Support</button>
+        <button type="button" data-tooltip="Rate Light Reader">Rate us</button>
+      </footer>
+
+      <div id="modalBackdrop" class="modal-backdrop" hidden>
+        <section id="howModal" class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="howTitle" hidden>
+          <div class="modal-header">
+            <span class="modal-kicker">Guide</span>
+            <button class="modal-close" type="button" data-close-modal aria-label="Close">×</button>
+          </div>
+          <h2 id="howTitle">How Light Reader Works</h2>
+          <div class="modal-list">
+            <p><strong>Auto</strong> looks for dark reading pages and leaves dashboards or light pages alone.</p>
+            <p><strong>Always</strong> saves a site rule so Light Reader runs on that domain every time.</p>
+            <p><strong>Never</strong> saves a site rule that keeps Light Reader off for that domain.</p>
+            <p><strong>Lighten Now</strong> applies temporarily to the current tab without saving a rule.</p>
+            <p><strong>Chrome pages</strong> and restricted browser screens cannot be changed by extensions.</p>
+          </div>
+        </section>
+
+        <section id="supportModal" class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="supportTitle" hidden>
+          <div class="modal-header">
+            <span class="modal-kicker">Support</span>
+            <button class="modal-close" type="button" data-close-modal aria-label="Close">×</button>
+          </div>
+          <h2 id="supportTitle">Need a hand?</h2>
+          <p class="modal-copy">Share diagnostics with a bug report so page-specific issues are easier to reproduce.</p>
+          <div id="diagnosticsSummary" class="diagnostics-box"></div>
+          <div class="modal-actions">
+            <button id="copyDiagnostics" class="secondary-action" type="button">Copy diagnostics</button>
+            <button id="emailSupport" class="secondary-action" type="button">Draft email</button>
+          </div>
+        </section>
+
+        <section id="aboutModal" class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="aboutTitle" hidden>
+          <div class="modal-header">
+            <span class="modal-kicker">About</span>
+            <button class="modal-close" type="button" data-close-modal aria-label="Close">×</button>
+          </div>
+          <h2 id="aboutTitle">Light Reader</h2>
+          <p class="modal-copy">A quiet reading helper that softens dark article pages while keeping site controls in your hands.</p>
+          <div class="about-grid">
+            <span>Version</span>
+            <strong id="extensionVersion">0.3.0</strong>
+            <span>Mode</span>
+            <strong id="aboutMode">Auto detect</strong>
+          </div>
+        </section>
+
+        <section id="resetModal" class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="resetTitle" hidden>
+          <div class="modal-header">
+            <span class="modal-kicker">Reset</span>
+            <button class="modal-close" type="button" data-close-modal aria-label="Close">×</button>
+          </div>
+          <h2 id="resetTitle">Reset all settings?</h2>
+          <p class="modal-copy">This restores the default shade, clears saved site rules, and returns the current tab to Auto.</p>
+          <div class="modal-actions">
+            <button class="secondary-action" type="button" data-close-modal>Cancel</button>
+            <button id="confirmResetAll" class="danger-action" type="button">Reset all</button>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script src="light-reader-shared.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

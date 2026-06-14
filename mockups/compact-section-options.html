@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Light Reader Compact Section Mockups</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --paper: #fffdf8;
+        --surface: rgba(255, 255, 255, 0.88);
+        --line: rgba(28, 28, 28, 0.14);
+        --line-strong: rgba(28, 28, 28, 0.2);
+        --ink: #18181c;
+        --muted: #656269;
+        --amber: #f59e0b;
+        --amber-soft: #fff7e8;
+        --green: #5a9e35;
+        --blue: #004fc4;
+        --shadow: 0 10px 24px rgba(57, 47, 31, 0.16), 0 1px 0 rgba(255, 255, 255, 0.82) inset;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 28% -10%, rgba(245, 158, 11, 0.16), transparent 26%),
+          linear-gradient(180deg, #fffaf0 0%, #f0ece5 100%);
+        color: var(--ink);
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      .board {
+        display: grid;
+        gap: 18px;
+        padding: 24px;
+      }
+
+      .board-header {
+        display: grid;
+        gap: 6px;
+        max-width: 860px;
+      }
+
+      .board-header h1 {
+        font-size: 24px;
+        line-height: 1.08;
+        letter-spacing: 0;
+      }
+
+      .board-header p {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(249px, 1fr));
+        gap: 18px;
+        align-items: start;
+      }
+
+      .option {
+        display: grid;
+        gap: 9px;
+      }
+
+      .option-caption {
+        display: grid;
+        gap: 3px;
+        padding: 0 2px;
+      }
+
+      .option-caption h2 {
+        font-size: 13px;
+        line-height: 1.2;
+      }
+
+      .option-caption p {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.35;
+      }
+
+      .panel {
+        width: 249px;
+        display: grid;
+        gap: 6px;
+        padding: 9px;
+        background: linear-gradient(180deg, rgba(255, 253, 248, 0.97), rgba(250, 247, 241, 0.95));
+        border: 1px solid rgba(28, 28, 28, 0.16);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        padding: 1px 1px 5px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .brand img {
+        width: 31px;
+        height: 31px;
+        object-fit: contain;
+      }
+
+      .brand h3 {
+        font-size: 15px;
+        line-height: 1.08;
+        font-weight: 780;
+        letter-spacing: 0;
+      }
+
+      .status-line {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 3px;
+        color: #454247;
+        font-size: 9px;
+        line-height: 1.3;
+      }
+
+      .dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 0 2px rgba(90, 158, 53, 0.12);
+      }
+
+      .actions {
+        display: flex;
+        gap: 2px;
+      }
+
+      .icon-button {
+        display: grid;
+        place-items: center;
+        width: 21px;
+        height: 21px;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: #222226;
+        font-size: 14px;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--surface);
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset, 0 5px 10px rgba(64, 53, 34, 0.04);
+      }
+
+      .label {
+        color: #1b1b20;
+        font-size: 9.75px;
+        font-weight: 760;
+        line-height: 1.2;
+      }
+
+      .hint,
+      .micro {
+        color: var(--muted);
+        font-size: 8.5px;
+        line-height: 1.35;
+      }
+
+      .toggle {
+        appearance: none;
+        position: relative;
+        width: 30px;
+        height: 16px;
+        border: 1px solid rgba(237, 138, 0, 0.65);
+        border-radius: 999px;
+        background: linear-gradient(135deg, #f7a51a, #f08b00);
+        flex: 0 0 auto;
+      }
+
+      .toggle::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: white;
+        box-shadow: 0 1px 5px rgba(31, 23, 8, 0.24);
+      }
+
+      .segmented {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        overflow: hidden;
+        border: 1px solid var(--line-strong);
+        border-radius: 7px;
+        background: rgba(255, 255, 255, 0.58);
+      }
+
+      .segmented button {
+        min-height: 21px;
+        border: 0;
+        border-right: 1px solid var(--line);
+        background: transparent;
+        color: #4a474d;
+        font-size: 8.75px;
+        font-weight: 680;
+      }
+
+      .segmented button:last-child {
+        border-right: 0;
+      }
+
+      .segmented .active {
+        border: 1px solid var(--amber);
+        background: #fff9ee;
+        color: #d97706;
+      }
+
+      .background-placeholder {
+        display: grid;
+        gap: 6px;
+        padding: 7px;
+      }
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+      }
+
+      .swatch {
+        min-height: 26px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: rgba(255, 255, 255, 0.66);
+      }
+
+      .action {
+        min-height: 30px;
+        border: 0;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #f7a51a 0%, #f09600 56%, #ee8500 100%);
+        color: white;
+        font-size: 10px;
+        font-weight: 780;
+      }
+
+      .footer-ghost {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3px;
+        padding-top: 2px;
+      }
+
+      .footer-ghost span {
+        height: 18px;
+        border-radius: 6px;
+        background: rgba(28, 28, 28, 0.04);
+      }
+
+      .option-1 .combined {
+        display: grid;
+        gap: 6px;
+        padding: 7px;
+      }
+
+      .option-1 .enable-row,
+      .option-3 .inline-row,
+      .option-4 .pill-row,
+      .option-5 .site-top,
+      .option-5 .site-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .option-1 .copy {
+        display: grid;
+        gap: 2px;
+      }
+
+      .option-2 .hero-toggle {
+        margin-left: auto;
+      }
+
+      .option-2 .site-card,
+      .option-3 .site-card {
+        display: grid;
+        gap: 5px;
+        padding: 7px;
+      }
+
+      .option-2 .hero {
+        padding-bottom: 3px;
+      }
+
+      .option-2 .actions {
+        align-items: center;
+      }
+
+      .option-3 .site-card {
+        padding: 6px 7px;
+      }
+
+      .option-3 .inline-row .label {
+        white-space: nowrap;
+      }
+
+      .option-3 .segmented {
+        width: 148px;
+      }
+
+      .option-4 .status-pill {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-height: 26px;
+        padding: 4px 7px;
+        border: 1px solid rgba(90, 158, 53, 0.22);
+        border-radius: 999px;
+        background: rgba(90, 158, 53, 0.09);
+        color: #357821;
+        font-size: 9px;
+        font-weight: 760;
+      }
+
+      .option-4 .status-pill::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .option-4 .site-card {
+        display: grid;
+        gap: 5px;
+        padding: 6px 7px;
+      }
+
+      .option-5 .current-site {
+        display: grid;
+        gap: 5px;
+        padding: 7px;
+      }
+
+      .option-5 .site-meta {
+        padding-top: 1px;
+      }
+
+      .option-5 .hostname {
+        overflow: hidden;
+        color: var(--muted);
+        font-size: 8.5px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .option-5 .segmented button {
+        min-height: 20px;
+      }
+
+      @media (max-width: 640px) {
+        .board {
+          padding: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="board">
+      <header class="board-header">
+        <h1>Light Reader Compact Control Options</h1>
+        <p>Five layout directions for the first two popup sections. Each keeps the current warm visual language and focuses only on reducing wasted height.</p>
+      </header>
+
+      <section class="options" aria-label="Compact layout options">
+        <article class="option option-1">
+          <div class="option-caption">
+            <h2>1. Combined Control Card</h2>
+            <p>Enable and Site Mode become one related control group.</p>
+          </div>
+          <div class="panel">
+            <div class="hero">
+              <div class="brand">
+                <img src="../assets/light-reader-mark.png" alt="">
+                <div>
+                  <h3>Light Reader</h3>
+                  <p class="status-line"><span class="dot"></span>Auto-lightening this page.</p>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="icon-button" type="button">&#9881;</button>
+                <button class="icon-button" type="button">&#8942;</button>
+              </div>
+            </div>
+            <section class="card combined">
+              <div class="enable-row">
+                <div class="copy">
+                  <p class="label">Light Reader</p>
+                  <p class="micro">Enabled on this site</p>
+                </div>
+                <input class="toggle" type="checkbox" checked>
+              </div>
+              <div class="segmented">
+                <button class="active" type="button">Auto</button>
+                <button type="button">Always</button>
+                <button type="button">Never</button>
+              </div>
+              <p class="hint">Auto detect dark pages.</p>
+            </section>
+            <section class="card background-placeholder">
+              <p class="label">Reading Background</p>
+              <div class="swatches"><span class="swatch"></span><span class="swatch"></span><span class="swatch"></span><span class="swatch"></span></div>
+            </section>
+            <button class="action" type="button">Lighten Now</button>
+            <div class="footer-ghost"><span></span><span></span><span></span></div>
+          </div>
+        </article>
+
+        <article class="option option-2">
+          <div class="option-caption">
+            <h2>2. Header Toggle</h2>
+            <p>Global enable moves into the header, leaving Site Mode as first card.</p>
+          </div>
+          <div class="panel">
+            <div class="hero">
+              <div class="brand">
+                <img src="../assets/light-reader-mark.png" alt="">
+                <div>
+                  <h3>Light Reader</h3>
+                  <p class="status-line"><span class="dot"></span>Auto-lightening this page.</p>
+                </div>
+              </div>
+              <div class="actions">
+                <input class="toggle hero-toggle" type="checkbox" checked>
+                <button class="icon-button" type="button">&#8942;</button>
+              </div>
+            </div>
+            <section class="card site-card">
+              <p class="label">Site Mode</p>
+              <div class="segmented">
+                <button class="active" type="button">Auto</button>
+                <button type="button">Always</button>
+                <button type="button">Never</button>
+              </div>
+              <p class="hint">Auto detect dark pages.</p>
+            </section>
+            <section class="card background-placeholder">
+              <p class="label">Reading Background</p>
+              <div class="swatches"><span class="swatch"></span><span class="swatch"></span><span class="swatch"></span><span class="swatch"></span></div>
+            </section>
+            <button class="action" type="button">Lighten Now</button>
+            <div class="footer-ghost"><span></span><span></span><span></span></div>
+          </div>
+        </article>
+
+        <article class="option option-3">
+          <div class="option-caption">
+            <h2>3. Inline Site Mode</h2>
+            <p>Site Mode becomes a single compact row instead of a tall section.</p>
+          </div>
+          <div class="panel">
+            <div class="hero">
+              <div class="brand">
+                <img src="../assets/light-reader-mark.png" alt="">
+                <div>
+                  <h3>Light Reader</h3>
+                  <p class="status-line"><span class="dot"></span>Auto-lightening this page.</p>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="icon-button" type="button">&#9881;</button>
+                <button class="icon-button" type="button">&#8942;</button>
+              </div>
+            </div>
+            <label class="card combined enable-row">
+              <div class="copy">
+                <p class="label">Enable Light Reader</p>
+                <p class="micro">Applies to this site</p>
+              </div>
+              <input class="toggle" type="checkbox" checked>
+            </label>
+            <section class="card site-card">
+              <div class="inline-row">
+                <p class="label">Site Mode</p>
+                <div class="segmented">
+                  <button class="active" type="button">Auto</button>
+                  <button type="button">Always</button>
+                  <button type="button">Never</button>
+                </div>
+              </div>
+              <p class="hint">Auto detect dark pages.</p>
+            </section>
+            <section class="card background-placeholder">
+              <p class="label">Reading Background</p>
+              <div class="swatches"><span class="swatch"></span><span class="swatch"></span><span class="swatch"></span><span class="swatch"></span></div>
+            </section>
+            <button class="action" type="button">Lighten Now</button>
+          </div>
+        </article>
+
+        <article class="option option-4">
+          <div class="option-caption">
+            <h2>4. Enabled Status Pill</h2>
+            <p>Enable becomes a small status pill, with Site Mode still explicit.</p>
+          </div>
+          <div class="panel">
+            <div class="hero">
+              <div class="brand">
+                <img src="../assets/light-reader-mark.png" alt="">
+                <div>
+                  <h3>Light Reader</h3>
+                  <p class="status-line"><span class="dot"></span>Auto-lightening this page.</p>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="icon-button" type="button">&#9881;</button>
+                <button class="icon-button" type="button">&#8942;</button>
+              </div>
+            </div>
+            <div class="pill-row">
+              <span class="status-pill">Enabled</span>
+              <input class="toggle" type="checkbox" checked>
+            </div>
+            <section class="card site-card">
+              <p class="label">Site Mode</p>
+              <div class="segmented">
+                <button class="active" type="button">Auto</button>
+                <button type="button">Always</button>
+                <button type="button">Never</button>
+              </div>
+              <p class="hint">Auto detect dark pages.</p>
+            </section>
+            <section class="card background-placeholder">
+              <p class="label">Reading Background</p>
+              <div class="swatches"><span class="swatch"></span><span class="swatch"></span><span class="swatch"></span><span class="swatch"></span></div>
+            </section>
+            <button class="action" type="button">Lighten Now</button>
+          </div>
+        </article>
+
+        <article class="option option-5">
+          <div class="option-caption">
+            <h2>5. Current Site Card</h2>
+            <p>Site-specific controls live in one compact, clearly named card.</p>
+          </div>
+          <div class="panel">
+            <div class="hero">
+              <div class="brand">
+                <img src="../assets/light-reader-mark.png" alt="">
+                <div>
+                  <h3>Light Reader</h3>
+                  <p class="status-line"><span class="dot"></span>Auto-lightening this page.</p>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="icon-button" type="button">&#9881;</button>
+                <button class="icon-button" type="button">&#8942;</button>
+              </div>
+            </div>
+            <section class="card current-site">
+              <div class="site-top">
+                <div>
+                  <p class="label">Current Site</p>
+                  <p class="hostname">newsletter.semianalysis.com</p>
+                </div>
+                <input class="toggle" type="checkbox" checked>
+              </div>
+              <div class="segmented">
+                <button class="active" type="button">Auto</button>
+                <button type="button">Always</button>
+                <button type="button">Never</button>
+              </div>
+              <div class="site-meta">
+                <p class="hint">Auto detect dark pages.</p>
+                <p class="micro">Enabled</p>
+              </div>
+            </section>
+            <section class="card background-placeholder">
+              <p class="label">Reading Background</p>
+              <div class="swatches"><span class="swatch"></span><span class="swatch"></span><span class="swatch"></span><span class="swatch"></span></div>
+            </section>
+            <button class="action" type="button">Lighten Now</button>
+            <div class="footer-ghost"><span></span><span></span><span></span></div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

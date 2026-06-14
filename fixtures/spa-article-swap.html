@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SPA Article Swap Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #101113;
+        color: #eeeeee;
+        font-family: Georgia, serif;
+      }
+
+      nav {
+        padding: 16px 24px;
+        background: #22252a;
+      }
+
+      button {
+        min-height: 32px;
+      }
+
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 24px;
+        line-height: 1.7;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <button id="swap">Swap Route Content</button>
+    </nav>
+    <main>
+      <article id="article">
+        <h1>Initial Dark Article</h1>
+        <p>This first article should be detected automatically after page load because it is central, dark, readable prose.</p>
+        <p>Click the route swap button to replace this content and call history.pushState, then confirm Light Reader re-evaluates the page.</p>
+        <p>The temporary mode should reset back to auto when the fixture route changes.</p>
+      </article>
+    </main>
+    <script src="spa-article-swap.js"></script>
+  </body>
+</html>

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Light Reader QA Fixtures</title>
+    <style>
+      :root {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color-scheme: light;
+        --ink: #18181c;
+        --muted: #656269;
+        --line: rgba(28, 28, 28, 0.14);
+        --amber: #f59e0b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 50% -10%, rgba(245, 158, 11, 0.14), transparent 30%),
+          linear-gradient(180deg, #fffaf0 0%, #f4f1eb 100%);
+        color: var(--ink);
+      }
+
+      main {
+        width: min(760px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 38px 0;
+      }
+
+      h1,
+      p {
+        margin: 0;
+      }
+
+      header {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        font-size: 28px;
+        line-height: 1.05;
+      }
+
+      p {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+      }
+
+      .notice {
+        margin-bottom: 18px;
+        padding: 12px 14px;
+        border: 1px solid rgba(245, 158, 11, 0.34);
+        border-radius: 12px;
+        background: #fff7e8;
+      }
+
+      .notice strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      a {
+        display: grid;
+        gap: 7px;
+        min-height: 112px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.78);
+        color: inherit;
+        text-decoration: none;
+        box-shadow: 0 8px 18px rgba(64, 53, 34, 0.06);
+      }
+
+      a:hover {
+        border-color: rgba(245, 158, 11, 0.42);
+        background: #fff7e8;
+      }
+
+      strong {
+        font-size: 15px;
+      }
+
+      span {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Light Reader QA Fixtures</h1>
+        <p>Use these local pages to manually check auto-detection, site modes, temporary lightening, and code readability.</p>
+      </header>
+      <section class="notice" aria-label="Chrome file access note">
+        <strong>Before testing local fixtures</strong>
+        <p>This packaged page is a guide. For live extension testing, open these fixture files from the cloned repo with file URLs, then enable Allow access to file URLs in Chrome extension details.</p>
+      </section>
+      <section class="grid" aria-label="Fixture pages">
+        <a href="dark-article.html">
+          <strong>Dark article</strong>
+          <span>Should auto-lighten as a reading surface.</span>
+        </a>
+        <a href="light-article.html">
+          <strong>Light article</strong>
+          <span>Should stay unchanged in Auto.</span>
+        </a>
+        <a href="spa-article-swap.html">
+          <strong>SPA route swap</strong>
+          <span>Should re-evaluate when content changes.</span>
+        </a>
+        <a href="dark-dashboard.html">
+          <strong>Dark dashboard</strong>
+          <span>Should avoid over-applying in Auto.</span>
+        </a>
+        <a href="code-heavy-docs.html">
+          <strong>Code-heavy docs</strong>
+          <span>Should keep code blocks readable.</span>
+        </a>
+        <a href="dark-shell-article.html">
+          <strong>Dark shell article</strong>
+          <span>Should lighten page shell and article content together.</span>
+        </a>
+      </section>
+    </main>
+  </body>
+</html>

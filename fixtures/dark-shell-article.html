@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dark Shell Article Fixture</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #111017;
+        color: #f2f2f2;
+        font-family: system-ui, sans-serif;
+      }
+
+      .app-shell {
+        min-height: 100vh;
+        background: #111017;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        padding: 22px 32px;
+        border-bottom: 1px solid #25222d;
+      }
+
+      .article-frame {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 44px 0 80px;
+      }
+
+      article {
+        padding: 42px 56px;
+        background: #111017;
+        color: #eeeeee;
+        line-height: 1.7;
+      }
+
+      p {
+        font-family: Georgia, serif;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header>
+        <strong>Newsletter</strong>
+        <span>Subscribe</span>
+      </header>
+      <div class="article-frame">
+        <article>
+          <h1>Dark Shell Around a Reading Surface</h1>
+          <p>This fixture represents a newsletter layout where the article sits inside multiple dark application wrappers.</p>
+          <p>Light Reader should not only lighten this article block; it should also lighten the surrounding page shell so the side gutters are comfortable.</p>
+          <p>When this site is forced with Always lighten, text should remain readable and the article should not become black text on a dark background.</p>
+        </article>
+      </div>
+    </div>
+  </body>
+</html>
