@@ -10,9 +10,12 @@ const {
 const TARGET_ATTR = "data-light-reader-target";
 const SHELL_ATTR = "data-light-reader-shell";
 const BACKDROP_ATTR = "data-light-reader-backdrop";
+const ISLAND_ATTR = "data-light-reader-island";
+const CHROME_ATTR = "data-light-reader-chrome";
 const MODE_ATTR = "data-light-reader-mode";
 const MIN_READING_SCORE = 7;
 const MIN_UNCERTAIN_SCORE = 4.5;
+const ISLAND_SCAN_LIMIT = 900;
 const RECHECK_DELAY_MS = 650;
 
 const MAIN_SELECTORS = [
@@ -100,6 +103,40 @@ const READABLE_INLINE_SELECTOR = [
   "svg"
 ].join(",");
 
+const READABLE_TEXT_SELECTOR = [
+  "p",
+  "li",
+  "dd",
+  "dt",
+  "div",
+  "section",
+  "article",
+  "header",
+  "nav",
+  "blockquote",
+  "figcaption",
+  "summary",
+  "details",
+  "time",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "span",
+  "strong",
+  "em",
+  "b",
+  "i",
+  "small",
+  "code",
+  "pre",
+  "table",
+  "th",
+  "td"
+].join(",");
+
 const BACKDROP_EXCLUDED_SELECTOR = [
   "button",
   "input",
@@ -114,6 +151,36 @@ const BACKDROP_EXCLUDED_SELECTOR = [
   "pre",
   "code",
   "table"
+].join(",");
+
+const ISLAND_EXCLUDED_SELECTOR = [
+  "script",
+  "style",
+  "noscript",
+  "template",
+  "iframe",
+  "picture",
+  "img",
+  "video",
+  "canvas",
+  "svg",
+  "pre",
+  "code"
+].join(",");
+
+const CONTROL_SELECTOR = [
+  "button",
+  "input",
+  "select",
+  "textarea",
+  "[contenteditable='true']",
+  "[role='button']",
+  "[role='tab']",
+  "[role='switch']",
+  "[role='checkbox']",
+  "[role='radio']",
+  "[role='combobox']",
+  "[role='textbox']"
 ].join(",");
 
 let currentSettings = sanitizeSettings();
@@ -342,7 +409,8 @@ function detectionSignals(candidate, cleanupCount = 0) {
     backgroundLuminance: candidate.bgLum,
     textLuminance: candidate.textLum,
     imageBackdrop: candidate.imageBackdrop,
-    cleanupTargets: cleanupCount
+    cleanupTargets: cleanupCount,
+    darkIslands: 0
   };
 }
 
@@ -382,6 +450,14 @@ function clearTargets() {
 
   for (const element of document.querySelectorAll(`[${BACKDROP_ATTR}]`)) {
     element.removeAttribute(BACKDROP_ATTR);
+  }
+
+  for (const element of document.querySelectorAll(`[${ISLAND_ATTR}]`)) {
+    element.removeAttribute(ISLAND_ATTR);
+  }
+
+  for (const element of document.querySelectorAll(`[${CHROME_ATTR}]`)) {
+    element.removeAttribute(CHROME_ATTR);
   }
 }
 
@@ -425,6 +501,100 @@ function markNestedBackdrops(target) {
     ...detection.signals,
     cleanupTargets: marked
   };
+}
+
+function hasStrongDarkShadow(style) {
+  if (!style.boxShadow || style.boxShadow === "none") return false;
+
+  for (const match of style.boxShadow.matchAll(/rgba?\([^)]+\)/g)) {
+    const color = parseRgb(match[0]);
+    if (color && luminance(color) < 0.22) return true;
+  }
+
+  return false;
+}
+
+function hasDarkOwnSurface(element) {
+  const style = getComputedStyle(element);
+  const backgroundColor = parseRgb(style.backgroundColor);
+
+  return Boolean(
+    hasBackgroundImage(style) ||
+      backgroundAttachmentIsFixed(style) ||
+      (backgroundColor && luminance(backgroundColor) < 0.42) ||
+      hasStrongDarkShadow(style) ||
+      pseudoHasBackdrop(element, "::before") ||
+      pseudoHasBackdrop(element, "::after")
+  );
+}
+
+function islandTextLength(element) {
+  return (element.innerText || element.textContent || "").replace(/\s+/g, " ").trim().length;
+}
+
+function isConservativeControl(element) {
+  return element.matches(CONTROL_SELECTOR);
+}
+
+function shouldRepairDarkIsland(element) {
+  if (!isVisibleElement(element)) return false;
+  if (element.matches(ISLAND_EXCLUDED_SELECTOR)) return false;
+  if (element.closest(`[${BACKDROP_ATTR}], [${ISLAND_ATTR}]`)) return false;
+  if (isConservativeControl(element) && !element.closest(`[${BACKDROP_ATTR}]`)) return false;
+  if (visibleArea(element) < 40) return false;
+  if (islandTextLength(element) < 2) return false;
+
+  return hasDarkOwnSurface(element);
+}
+
+function markDarkIslands(target) {
+  if (!target) return;
+
+  let marked = 0;
+  const candidates = Array.from(target.querySelectorAll("*")).slice(0, ISLAND_SCAN_LIMIT);
+
+  for (const element of candidates) {
+    if (shouldRepairDarkIsland(element)) {
+      element.setAttribute(ISLAND_ATTR, "true");
+      marked += 1;
+    }
+  }
+
+  detection.signals = {
+    ...detection.signals,
+    darkIslands: marked
+  };
+}
+
+function hasOpaqueBackdrop(style) {
+  return hasBackgroundImage(style) || Boolean(parseRgb(style.backgroundColor));
+}
+
+function ridesOnLightenedShell(element) {
+  let node = element;
+
+  while (node && node !== document.documentElement) {
+    if (node.hasAttribute(TARGET_ATTR) || node.hasAttribute(BACKDROP_ATTR)) return false;
+    if (node.hasAttribute(SHELL_ATTR)) return true;
+
+    if (hasOpaqueBackdrop(getComputedStyle(node))) {
+      return false;
+    }
+
+    node = node.parentElement;
+  }
+
+  return false;
+}
+
+function markShellChrome() {
+  for (const element of document.querySelectorAll(BACKDROP_CHROME_SELECTOR)) {
+    if (!isVisibleElement(element) || element.closest(`[${TARGET_ATTR}], [${BACKDROP_ATTR}]`)) continue;
+
+    if (ridesOnLightenedShell(element)) {
+      element.setAttribute(CHROME_ATTR, "true");
+    }
+  }
 }
 
 function markTarget(element) {
@@ -559,13 +729,22 @@ function css(settings) {
       background: var(--light-reader-bg) !important;
     }
 
-    html[${ROOT_ATTR}="on"] [${SHELL_ATTR}="true"] {
+    html[${ROOT_ATTR}="on"] [${CHROME_ATTR}="true"],
+    html[${ROOT_ATTR}="on"] [${CHROME_ATTR}="true"] * {
       color: var(--light-reader-text) !important;
+      text-shadow: none !important;
+    }
+
+    html[${ROOT_ATTR}="on"] [${CHROME_ATTR}="true"] svg,
+    html[${ROOT_ATTR}="on"] [${CHROME_ATTR}="true"] svg * {
+      fill: currentColor !important;
+      stroke: currentColor !important;
     }
 
     html[${ROOT_ATTR}="on"] [${SHELL_ATTR}="true"],
     html[${ROOT_ATTR}="on"] [${TARGET_ATTR}="true"],
     html[${ROOT_ATTR}="on"] [${BACKDROP_ATTR}="true"],
+    html[${ROOT_ATTR}="on"] [${ISLAND_ATTR}="true"],
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="forced"] body,
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="temporary"] body,
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="forced"] :is(main, article, [role="main"], .content, #content, .entry-content, .post-content, .page-content, .article-content, .article-body, .story-body, .markdown-body, .prose),
@@ -578,14 +757,21 @@ function css(settings) {
     html[${ROOT_ATTR}="on"] [${TARGET_ATTR}="true"]::before,
     html[${ROOT_ATTR}="on"] [${TARGET_ATTR}="true"]::after,
     html[${ROOT_ATTR}="on"] [${BACKDROP_ATTR}="true"]::before,
-    html[${ROOT_ATTR}="on"] [${BACKDROP_ATTR}="true"]::after {
+    html[${ROOT_ATTR}="on"] [${BACKDROP_ATTR}="true"]::after,
+    html[${ROOT_ATTR}="on"] [${ISLAND_ATTR}="true"]::before,
+    html[${ROOT_ATTR}="on"] [${ISLAND_ATTR}="true"]::after {
       background-color: transparent !important;
       background-image: none !important;
       box-shadow: none !important;
       text-shadow: none !important;
     }
 
-    html[${ROOT_ATTR}="on"] [${SHELL_ATTR}="true"] :is(header, nav, [role="banner"], [role="navigation"]) :is(${READABLE_INLINE_SELECTOR}),
+    html[${ROOT_ATTR}="on"] [${ISLAND_ATTR}="true"] {
+      border-color: color-mix(in srgb, var(--light-reader-bg) 76%, black) !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+
     html[${ROOT_ATTR}="on"] [${BACKDROP_ATTR}="true"] :is(${READABLE_INLINE_SELECTOR}) {
       color: var(--light-reader-text) !important;
       fill: currentColor !important;
@@ -595,6 +781,7 @@ function css(settings) {
 
     html[${ROOT_ATTR}="on"] [${TARGET_ATTR}="true"],
     html[${ROOT_ATTR}="on"] [${BACKDROP_ATTR}="true"],
+    html[${ROOT_ATTR}="on"] [${ISLAND_ATTR}="true"],
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="forced"] body,
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="temporary"] body,
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="forced"] :is(main, article, [role="main"], .content, #content, .entry-content, .post-content, .page-content, .article-content, .article-body, .story-body, .markdown-body, .prose),
@@ -603,11 +790,13 @@ function css(settings) {
     }
 
     html[${ROOT_ATTR}="on"] [${TARGET_ATTR}="true"]
-      :is(p, li, dd, dt, blockquote, figcaption, summary, details, h1, h2, h3, h4, h5, h6, span, strong, em, b, i, small, code, pre, table, th, td),
+      :is(${READABLE_TEXT_SELECTOR}),
+    html[${ROOT_ATTR}="on"] [${ISLAND_ATTR}="true"]
+      :is(${READABLE_TEXT_SELECTOR}),
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="forced"] :is(main, article, [role="main"], .content, #content, .entry-content, .post-content, .page-content, .article-content, .article-body, .story-body, .markdown-body, .prose)
-      :is(p, li, dd, dt, blockquote, figcaption, summary, details, h1, h2, h3, h4, h5, h6, span, strong, em, b, i, small, code, pre, table, th, td),
+      :is(${READABLE_TEXT_SELECTOR}),
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="temporary"] :is(main, article, [role="main"], .content, #content, .entry-content, .post-content, .page-content, .article-content, .article-body, .story-body, .markdown-body, .prose)
-      :is(p, li, dd, dt, blockquote, figcaption, summary, details, h1, h2, h3, h4, h5, h6, span, strong, em, b, i, small, code, pre, table, th, td) {
+      :is(${READABLE_TEXT_SELECTOR}) {
       color: var(--light-reader-text) !important;
       text-shadow: none !important;
     }
@@ -619,7 +808,13 @@ function css(settings) {
       border-color: color-mix(in srgb, var(--light-reader-bg) 78%, black) !important;
     }
 
+    html[${ROOT_ATTR}="on"] [${ISLAND_ATTR}="true"] {
+      background-color: var(--light-reader-bg) !important;
+      background-image: none !important;
+    }
+
     html[${ROOT_ATTR}="on"] [${TARGET_ATTR}="true"] a,
+    html[${ROOT_ATTR}="on"] [${ISLAND_ATTR}="true"] a,
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="forced"] a,
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="temporary"] a {
       color: var(--light-reader-link) !important;
@@ -664,6 +859,8 @@ function applyState() {
     withLightReaderDisabled(() => {
       markTarget(target);
       markNestedBackdrops(target);
+      markDarkIslands(target);
+      markShellChrome();
     });
     document.documentElement.setAttribute(MODE_ATTR, mode);
     document.documentElement.setAttribute(ROOT_ATTR, "on");

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="light-reader-expected" content="auto-active">
+    <meta name="light-reader-covers" content="dark-islands,changelog,nav">
+    <title>Dark Header Changelog Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #05080d;
+        color: #f4f7fb;
+        font-family: system-ui, sans-serif;
+      }
+
+      .global-header {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        padding: 16px 28px;
+        background: #050505;
+      }
+
+      .global-header a {
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      main {
+        max-width: 840px;
+        margin: 0 auto;
+        padding: 48px 24px 72px;
+      }
+
+      article {
+        display: grid;
+        gap: 28px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 38px;
+        line-height: 1.1;
+        text-align: center;
+      }
+
+      .eyebrow,
+      time,
+      .title,
+      .meta {
+        color: #f4f7fb;
+      }
+
+      .eyebrow {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .changelog {
+        display: grid;
+        gap: 0;
+        border-top: 1px solid #1b2532;
+      }
+
+      .entry {
+        display: grid;
+        grid-template-columns: 120px minmax(0, 1fr) 96px;
+        gap: 18px;
+        padding: 18px 0;
+        border-bottom: 1px solid #1b2532;
+      }
+
+      .title {
+        font-size: 17px;
+        font-weight: 750;
+      }
+
+      .badge {
+        display: inline-flex;
+        justify-content: center;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: #111827;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 800;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="global-header">
+      <a href="#">Blog</a>
+      <a href="#">Changelog</a>
+      <a href="#">Docs</a>
+      <a href="#">Customer stories</a>
+    </header>
+    <main>
+      <article>
+        <div class="eyebrow">Release</div>
+        <h1>Copilot individual plan sign-ups are reopening</h1>
+        <section class="changelog" aria-label="Changelog entries">
+          <div class="entry">
+            <time datetime="2026-06-17">June 17, 2026</time>
+            <div class="title">Copilot sign-ups reopen for individual plans</div>
+            <div class="badge">Copilot</div>
+          </div>
+          <div class="entry">
+            <time datetime="2026-06-12">June 12, 2026</time>
+            <div class="title">Agent mode improvements are available</div>
+            <div class="badge">Copilot</div>
+          </div>
+          <div class="entry">
+            <time datetime="2026-06-10">June 10, 2026</time>
+            <div class="title">New controls arrive for enterprise administrators</div>
+            <div class="badge">Admin</div>
+          </div>
+        </section>
+      </article>
+    </main>
+  </body>
+</html>

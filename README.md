@@ -14,6 +14,7 @@ The project is intentionally plain MV3 HTML, CSS, and JavaScript. There is no bu
 - Supports a custom hex background color.
 - Keeps an editable **Always Lighten Sites** list.
 - Rechecks dynamic pages using delayed detection, mutation observation, and SPA route changes.
+- Repairs smaller dark text islands, such as badges, callouts, rows, and cards inside the active reading surface.
 - Supports a keyboard shortcut for **Lighten Now**.
 - Includes compact in-popup help, support diagnostics, reset controls, and a QA guide.
 
@@ -43,6 +44,7 @@ After code changes, return to `chrome://extensions` and click the reload button 
 - **More Options** can refresh page detection, reset settings, open the QA guide, and show version details.
 - **How it works** explains the detection model.
 - **Support** shows why Light Reader did or did not activate, with copyable diagnostics for bug reports.
+- **Dark island repair** runs inside the active reading surface and keeps most form controls conservative.
 
 ## Keyboard Shortcut
 
@@ -80,6 +82,11 @@ Fixture expectations:
 - `forum-comments.html`: should show the uncertain-page fallback.
 - `uncertain-dark-page.html`: should offer **Lighten Now** and **Always**.
 - `nav-shell-mismatch.html`: should keep top and secondary navigation readable after activation.
+- `dark-header-changelog.html`: should preserve dark global headers and fix changelog text.
+- `dark-island-badges.html`: should repair dark badges, custom tags, and callouts.
+- `dark-island-table.html`: should repair dark table rows and cells.
+- `dark-island-svg-labels.html`: should repair icon-adjacent dark labels.
+- `dark-island-dashboard-negative.html`: should stay inactive on app-like pages.
 - `light-article.html`: should stay unchanged in Auto; **Lighten Now** should still work.
 - `spa-article-swap.html`: should remain lightened after clicking **Swap Route Content**.
 - `dark-dashboard.html`: should not auto-lighten in Auto; **Lighten Now** should force it.
@@ -135,4 +142,5 @@ The extension does not send data to a server and does not include analytics.
 - Chrome blocks content scripts on Chrome Web Store pages, `chrome://` pages, extension pages, and some browser-owned screens.
 - Auto-detection is intentionally conservative on dashboards and control-heavy apps.
 - Some sites with aggressive CSS, iframes, closed shadow DOM, or canvas-rendered text may not fully inherit Light Reader styles.
+- Dark island repair does not traverse Shadow DOM or iframes in this version.
 - Cross-browser support, packaging, store listing assets, onboarding, import/export, and analytics are outside the current V1 scope.

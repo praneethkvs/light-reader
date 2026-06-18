@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="light-reader-expected" content="auto-active">
+    <meta name="light-reader-covers" content="dark-islands,svg-labels">
+    <title>Dark Island SVG Labels Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #101113;
+        color: #f5f5f5;
+        font-family: system-ui, sans-serif;
+      }
+
+      article {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 52px 24px;
+      }
+
+      p {
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      .metric {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 8px 8px 8px 0;
+        padding: 9px 12px;
+        border-radius: 8px;
+        background: #0a0f16;
+        color: #ffffff;
+        font-weight: 800;
+      }
+
+      .metric svg {
+        width: 18px;
+        height: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <article>
+      <h1>Icon Labels on Dark Chips</h1>
+      <p>Some pages place text next to inline SVG icons on a small dark label.</p>
+      <p>
+        <span class="metric">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="currentColor"></circle></svg>
+          Available
+        </span>
+        <span class="metric">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 18H4z" fill="currentColor"></path></svg>
+          Limited
+        </span>
+      </p>
+      <p>The island repair should make the chip light and keep text and icons visible.</p>
+    </article>
+  </body>
+</html>

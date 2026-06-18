@@ -340,6 +340,7 @@ function diagnosticPairs() {
     ["Control-heavy", signals.controlHeavy ? "Yes" : "No"],
     ["Images/textures", signals.imageBackdrop ? "Yes" : "No"],
     ["Cleanup targets", signals.cleanupTargets ?? 0],
+    ["Dark islands", signals.darkIslands ?? 0],
     ["Control penalty", signals.controlPenalty ?? "n/a"],
     ["Shade", settings.backgroundColor],
     ["Default shade", settings.defaultBackgroundColor]

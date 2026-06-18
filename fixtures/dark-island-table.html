@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="light-reader-expected" content="auto-active">
+    <meta name="light-reader-covers" content="dark-islands,tables">
+    <title>Dark Island Table Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #0f1117;
+        color: #f4f4f4;
+        font-family: system-ui, sans-serif;
+      }
+
+      main {
+        max-width: 840px;
+        margin: 0 auto;
+        padding: 52px 24px;
+      }
+
+      p {
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 26px 0;
+      }
+
+      th,
+      td {
+        padding: 14px;
+        border: 1px solid #2c3440;
+      }
+
+      tr.featured,
+      td.dark-cell {
+        background: #101820;
+        color: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Dark Rows and Cells</h1>
+      <p>Tables often contain dark highlighted rows or individual cells inside an otherwise readable page.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Plan</th>
+            <th>Status</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="featured">
+            <td>Individual</td>
+            <td>Reopened</td>
+            <td>Dark row should become readable after activation.</td>
+          </tr>
+          <tr>
+            <td>Team</td>
+            <td class="dark-cell">Preview</td>
+            <td>Only one dark cell should still be repaired.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>The repair pass should handle both row-level and cell-level dark islands.</p>
+    </main>
+  </body>
+</html>

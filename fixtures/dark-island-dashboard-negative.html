@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="light-reader-expected" content="auto-inactive">
+    <meta name="light-reader-covers" content="dark-islands,dashboard-negative">
+    <title>Dark Island Dashboard Negative Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #101318;
+        color: #f4f4f4;
+        font-family: system-ui, sans-serif;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        min-height: 100vh;
+      }
+
+      aside,
+      section {
+        padding: 22px;
+      }
+
+      .toolbar,
+      .card,
+      .badge {
+        background: #141a22;
+        color: #ffffff;
+      }
+
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 18px;
+        padding: 12px;
+      }
+
+      button,
+      input,
+      select {
+        min-height: 34px;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .badge {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 4px 8px;
+        border-radius: 999px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <aside>
+        <button>Dashboard</button>
+        <button>Reports</button>
+        <button>Settings</button>
+      </aside>
+      <section>
+        <h1>Control Heavy Dashboard</h1>
+        <p>This page contains many dark cards and badges, but Auto should stay inactive because the page is app-like.</p>
+        <div class="toolbar">
+          <input value="Search">
+          <select><option>Open</option></select>
+          <button>Export</button>
+        </div>
+        <div class="cards">
+          <div class="card">Queue depth <span class="badge">12</span></div>
+          <div class="card">Errors <span class="badge">4</span></div>
+          <div class="card">Owners <span class="badge">9</span></div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
