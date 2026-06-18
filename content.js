@@ -9,8 +9,10 @@ const {
 
 const TARGET_ATTR = "data-light-reader-target";
 const SHELL_ATTR = "data-light-reader-shell";
+const BACKDROP_ATTR = "data-light-reader-backdrop";
 const MODE_ATTR = "data-light-reader-mode";
 const MIN_READING_SCORE = 7;
+const MIN_UNCERTAIN_SCORE = 4.5;
 const RECHECK_DELAY_MS = 650;
 
 const MAIN_SELECTORS = [
@@ -52,7 +54,66 @@ const TEXT_BLOCK_SELECTORS = [
   "blockquote",
   "figcaption",
   "summary",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
   "pre"
+].join(",");
+
+const BACKDROP_CANDIDATE_SELECTOR = [
+  "main",
+  "article",
+  "header",
+  "nav",
+  "section",
+  "div",
+  "blockquote",
+  "li",
+  "dd",
+  "td",
+  "th",
+  "[role='banner']",
+  "[role='navigation']"
+].join(",");
+
+const BACKDROP_CHROME_SELECTOR = [
+  "header",
+  "nav",
+  "[role='banner']",
+  "[role='navigation']"
+].join(",");
+
+const READABLE_INLINE_SELECTOR = [
+  "a",
+  "button",
+  "span",
+  "strong",
+  "em",
+  "b",
+  "i",
+  "small",
+  "summary",
+  "label",
+  "svg"
+].join(",");
+
+const BACKDROP_EXCLUDED_SELECTOR = [
+  "button",
+  "input",
+  "select",
+  "textarea",
+  "iframe",
+  "picture",
+  "img",
+  "video",
+  "canvas",
+  "svg",
+  "pre",
+  "code",
+  "table"
 ].join(",");
 
 let currentSettings = sanitizeSettings();
@@ -60,8 +121,10 @@ let temporaryMode = "auto";
 let detection = {
   status: "unknown",
   detectedDark: false,
+  uncertain: false,
   reason: "Page has not been checked yet.",
-  score: 0
+  score: 0,
+  signals: {}
 };
 let bestReadingElement = null;
 let recheckTimer = 0;
@@ -99,16 +162,41 @@ function luminance(rgb) {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
-function effectiveBackground(element) {
+function hasBackgroundImage(style) {
+  return Boolean(style.backgroundImage && style.backgroundImage !== "none");
+}
+
+function effectiveBackgroundProfile(element) {
   let node = element;
+  let hasImageBackdrop = false;
 
   while (node && node.nodeType === Node.ELEMENT_NODE) {
-    const color = parseRgb(getComputedStyle(node).backgroundColor);
-    if (color) return color;
+    const style = getComputedStyle(node);
+    if (hasBackgroundImage(style)) {
+      hasImageBackdrop = true;
+    }
+
+    const color = parseRgb(style.backgroundColor);
+    if (color) {
+      return { color, hasImageBackdrop };
+    }
+
     node = node.parentElement;
   }
 
-  return parseRgb(getComputedStyle(document.documentElement).backgroundColor) || [255, 255, 255];
+  const rootStyle = getComputedStyle(document.documentElement);
+  if (hasBackgroundImage(rootStyle)) {
+    hasImageBackdrop = true;
+  }
+
+  return {
+    color: parseRgb(rootStyle.backgroundColor) || [255, 255, 255],
+    hasImageBackdrop
+  };
+}
+
+function backgroundAttachmentIsFixed(style) {
+  return typeof style.backgroundAttachment === "string" && style.backgroundAttachment.includes("fixed");
 }
 
 function visibleArea(element) {
@@ -162,13 +250,25 @@ function centralityScore(element) {
 
 function contrastState(element) {
   const style = getComputedStyle(element);
-  const bgLum = luminance(effectiveBackground(element));
-  const textLum = luminance(parseRgb(style.color));
+  const background = effectiveBackgroundProfile(element);
+  const colorLum = luminance(background.color);
+  const ownTextLum = luminance(parseRgb(style.color));
+  const descendantTextLum = Math.max(
+    0,
+    ...visibleTextBlocks(element)
+      .slice(0, 10)
+      .map((block) => luminance(parseRgb(getComputedStyle(block).color)))
+  );
+  const textLum = Math.max(ownTextLum, descendantTextLum);
+  const imageBackedDarkSurface = background.hasImageBackdrop && textLum > 0.62 && colorLum > 0.28;
+  const bgLum = imageBackedDarkSurface ? 0.12 : colorLum;
 
   return {
     bgLum,
     textLum,
-    isDarkWithLightText: bgLum < 0.28 && textLum > 0.62
+    colorLum,
+    hasImageBackdrop: background.hasImageBackdrop,
+    isDarkWithLightText: (bgLum < 0.28 || imageBackedDarkSurface) && textLum > 0.62
   };
 }
 
@@ -203,10 +303,51 @@ function scoreCandidate(element) {
   return {
     element,
     score,
+    semantic: semanticScore(element),
+    centrality: centralityScore(element),
+    controls,
+    links,
+    controlPenalty,
+    linkPenalty,
+    bgLum: Math.round(contrast.bgLum * 100) / 100,
+    textLum: Math.round(contrast.textLum * 100) / 100,
+    imageBackdrop: contrast.hasImageBackdrop,
     textLength: totalTextLength,
     blocks: blocks.length,
     area
   };
+}
+
+function elementLabel(element) {
+  if (!element) return "none";
+  const name = element.tagName.toLowerCase();
+  if (element.id) return `${name}#${element.id}`;
+  const className = Array.from(element.classList || []).slice(0, 2).join(".");
+  return className ? `${name}.${className}` : name;
+}
+
+function detectionSignals(candidate, cleanupCount = 0) {
+  if (!candidate) return {};
+
+  return {
+    target: elementLabel(candidate.element),
+    score: Math.round(candidate.score * 10) / 10,
+    textBlocks: candidate.blocks,
+    textLength: candidate.textLength,
+    controls: candidate.controls,
+    links: candidate.links,
+    controlHeavy: isControlHeavy(candidate),
+    controlPenalty: Math.round(candidate.controlPenalty * 10) / 10,
+    linkPenalty: Math.round(candidate.linkPenalty * 10) / 10,
+    backgroundLuminance: candidate.bgLum,
+    textLuminance: candidate.textLum,
+    imageBackdrop: candidate.imageBackdrop,
+    cleanupTargets: cleanupCount
+  };
+}
+
+function isControlHeavy(candidate) {
+  return candidate.controls >= 6 && candidate.controls >= Math.max(candidate.blocks * 2, 4);
 }
 
 function candidateElements() {
@@ -220,7 +361,7 @@ function candidateElements() {
 
   for (const block of Array.from(document.querySelectorAll(TEXT_BLOCK_SELECTORS)).slice(0, 140)) {
     let node = block.parentElement;
-    for (let depth = 0; node && depth < 3; depth += 1) {
+    for (let depth = 0; node && depth < 5; depth += 1) {
       candidates.add(node);
       node = node.parentElement;
     }
@@ -238,6 +379,52 @@ function clearTargets() {
   for (const element of document.querySelectorAll(`[${SHELL_ATTR}]`)) {
     element.removeAttribute(SHELL_ATTR);
   }
+
+  for (const element of document.querySelectorAll(`[${BACKDROP_ATTR}]`)) {
+    element.removeAttribute(BACKDROP_ATTR);
+  }
+}
+
+function hasDarkBackdrop(style) {
+  const backgroundImage = hasBackgroundImage(style);
+  const backgroundColor = parseRgb(style.backgroundColor);
+  const fixedBackground = backgroundImage && backgroundAttachmentIsFixed(style);
+  const shadow = style.boxShadow && style.boxShadow !== "none";
+  return backgroundImage || fixedBackground || shadow || (backgroundColor && luminance(backgroundColor) < 0.42);
+}
+
+function pseudoHasBackdrop(element, pseudoElement) {
+  const style = getComputedStyle(element, pseudoElement);
+  const hasContent = style.content && style.content !== "none" && style.content !== "normal";
+  return hasContent && hasDarkBackdrop(style);
+}
+
+function shouldNeutralizeBackdrop(element) {
+  const isNestedChrome = element.matches(BACKDROP_CHROME_SELECTOR);
+  if (!isVisibleElement(element) || (!isNestedChrome && isExcludedChrome(element))) return false;
+  if (element.matches(BACKDROP_EXCLUDED_SELECTOR) || element.closest(BACKDROP_EXCLUDED_SELECTOR)) return false;
+  if (visibleArea(element) < 900 || textLength(element) < 35) return false;
+
+  const style = getComputedStyle(element);
+  return hasDarkBackdrop(style) || pseudoHasBackdrop(element, "::before") || pseudoHasBackdrop(element, "::after");
+}
+
+function markNestedBackdrops(target) {
+  if (!target) return;
+
+  let marked = 0;
+  const candidates = [target, ...target.querySelectorAll(BACKDROP_CANDIDATE_SELECTOR)];
+  for (const element of candidates) {
+    if (element !== target && shouldNeutralizeBackdrop(element)) {
+      element.setAttribute(BACKDROP_ATTR, "true");
+      marked += 1;
+    }
+  }
+
+  detection.signals = {
+    ...detection.signals,
+    cleanupTargets: marked
+  };
 }
 
 function markTarget(element) {
@@ -286,12 +473,26 @@ function evaluatePage() {
 
     bestReadingElement = best?.element || null;
 
-    if (best && best.score >= MIN_READING_SCORE) {
+    if (best && best.score >= MIN_READING_SCORE && !isControlHeavy(best)) {
       detection = {
         status: "active",
         detectedDark: true,
+        uncertain: false,
         reason: "Dark reading content detected.",
-        score: Math.round(best.score * 10) / 10
+        score: Math.round(best.score * 10) / 10,
+        signals: detectionSignals(best)
+      };
+      return;
+    }
+
+    if (best && best.score >= MIN_UNCERTAIN_SCORE && best.blocks >= 2 && best.textLength >= 250) {
+      detection = {
+        status: "uncertain",
+        detectedDark: false,
+        uncertain: true,
+        reason: "Looks dark. Lighten this page?",
+        score: Math.round(best.score * 10) / 10,
+        signals: detectionSignals(best)
       };
       return;
     }
@@ -299,8 +500,10 @@ function evaluatePage() {
     detection = {
       status: "inactive",
       detectedDark: false,
+      uncertain: false,
       reason: best ? "Page is dark, but does not look like a reading surface." : "No dark reading content detected.",
-      score: best ? Math.round(best.score * 10) / 10 : 0
+      score: best ? Math.round(best.score * 10) / 10 : 0,
+      signals: best ? detectionSignals(best) : {}
     };
   });
 }
@@ -309,8 +512,10 @@ function resetDetection(reason) {
   detection = {
     status: "unknown",
     detectedDark: false,
+    uncertain: false,
     reason,
-    score: 0
+    score: 0,
+    signals: {}
   };
   bestReadingElement = null;
 }
@@ -354,8 +559,13 @@ function css(settings) {
       background: var(--light-reader-bg) !important;
     }
 
+    html[${ROOT_ATTR}="on"] [${SHELL_ATTR}="true"] {
+      color: var(--light-reader-text) !important;
+    }
+
     html[${ROOT_ATTR}="on"] [${SHELL_ATTR}="true"],
     html[${ROOT_ATTR}="on"] [${TARGET_ATTR}="true"],
+    html[${ROOT_ATTR}="on"] [${BACKDROP_ATTR}="true"],
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="forced"] body,
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="temporary"] body,
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="forced"] :is(main, article, [role="main"], .content, #content, .entry-content, .post-content, .page-content, .article-content, .article-body, .story-body, .markdown-body, .prose),
@@ -364,7 +574,27 @@ function css(settings) {
       background-image: none !important;
     }
 
+    html[${ROOT_ATTR}="on"] [${BACKDROP_ATTR}="true"],
+    html[${ROOT_ATTR}="on"] [${TARGET_ATTR}="true"]::before,
+    html[${ROOT_ATTR}="on"] [${TARGET_ATTR}="true"]::after,
+    html[${ROOT_ATTR}="on"] [${BACKDROP_ATTR}="true"]::before,
+    html[${ROOT_ATTR}="on"] [${BACKDROP_ATTR}="true"]::after {
+      background-color: transparent !important;
+      background-image: none !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+
+    html[${ROOT_ATTR}="on"] [${SHELL_ATTR}="true"] :is(header, nav, [role="banner"], [role="navigation"]) :is(${READABLE_INLINE_SELECTOR}),
+    html[${ROOT_ATTR}="on"] [${BACKDROP_ATTR}="true"] :is(${READABLE_INLINE_SELECTOR}) {
+      color: var(--light-reader-text) !important;
+      fill: currentColor !important;
+      stroke: currentColor !important;
+      text-shadow: none !important;
+    }
+
     html[${ROOT_ATTR}="on"] [${TARGET_ATTR}="true"],
+    html[${ROOT_ATTR}="on"] [${BACKDROP_ATTR}="true"],
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="forced"] body,
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="temporary"] body,
     html[${ROOT_ATTR}="on"][${MODE_ATTR}="forced"] :is(main, article, [role="main"], .content, #content, .entry-content, .post-content, .page-content, .article-content, .article-body, .story-body, .markdown-body, .prose),
@@ -431,7 +661,10 @@ function applyState() {
   const target = mode === "auto" ? bestReadingElement : bestReadingElement || document.body;
 
   if (isActive) {
-    markTarget(target);
+    withLightReaderDisabled(() => {
+      markTarget(target);
+      markNestedBackdrops(target);
+    });
     document.documentElement.setAttribute(MODE_ATTR, mode);
     document.documentElement.setAttribute(ROOT_ATTR, "on");
   } else {
@@ -484,9 +717,13 @@ function sendStatus(sendResponse) {
     active,
     hostname: hostnameFromLocation(location),
     siteMode,
+    detectionStatus: detection.status,
     detectedDark: detection.detectedDark,
+    uncertain: detection.uncertain,
     reason: statusReason(active, siteMode),
-    temporary: temporaryMode === "on"
+    score: detection.score,
+    temporary: temporaryMode === "on",
+    signals: detection.signals || {}
   });
 }
 

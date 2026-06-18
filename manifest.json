@@ -1,12 +1,24 @@
 {
   "manifest_version": 3,
   "name": "Light Reader",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Softens dark pages with light text by switching the main reading area to a user-chosen light background.",
   "permissions": ["activeTab", "storage"],
   "action": {
     "default_title": "Light Reader",
     "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "toggle-lighten-now": {
+      "suggested_key": {
+        "default": "Alt+Shift+L",
+        "mac": "MacCtrl+Shift+L"
+      },
+      "description": "Toggle Lighten Now for the current tab"
+    }
   },
   "content_scripts": [
     {

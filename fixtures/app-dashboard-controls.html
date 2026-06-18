@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="light-reader-expected" content="auto-inactive">
+    <title>App Dashboard Controls Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #111318;
+        color: #f2f2f2;
+        font-family: system-ui, sans-serif;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        min-height: 100vh;
+      }
+
+      nav,
+      section {
+        padding: 20px;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      button,
+      input,
+      select {
+        min-height: 34px;
+      }
+
+      .card {
+        padding: 18px;
+        background: #1a1e25;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav>
+        <button>Dashboard</button>
+        <button>Reports</button>
+        <button>Settings</button>
+      </nav>
+      <section>
+        <h1>Operations Dashboard</h1>
+        <p>This page is dark but control-heavy. Auto should avoid transforming it because it is not a calm reading surface.</p>
+        <input value="Search">
+        <select><option>Last 30 days</option></select>
+        <div class="cards">
+          <div class="card"><button>Open</button><p>Revenue, status, queue depth, and owner controls.</p></div>
+          <div class="card"><button>Review</button><p>Alerts, filters, batch actions, and workflow buttons.</p></div>
+          <div class="card"><button>Export</button><p>Charts, toggles, tabs, and dense operational metadata.</p></div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

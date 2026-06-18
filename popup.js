@@ -18,6 +18,9 @@ const siteMode = document.getElementById("siteMode");
 const siteModeButtons = document.getElementById("siteModeButtons");
 const siteModeHint = document.getElementById("siteModeHint");
 const status = document.getElementById("status");
+const fallbackPrompt = document.getElementById("fallbackPrompt");
+const fallbackLighten = document.getElementById("fallbackLighten");
+const fallbackAlways = document.getElementById("fallbackAlways");
 const reset = document.getElementById("reset");
 const setDefaultShade = document.getElementById("setDefaultShade");
 const defaultShadeHint = document.getElementById("defaultShadeHint");
@@ -37,14 +40,17 @@ const diagnosticsSummary = document.getElementById("diagnosticsSummary");
 const extensionVersion = document.getElementById("extensionVersion");
 const aboutMode = document.getElementById("aboutMode");
 const confirmResetAll = document.getElementById("confirmResetAll");
+const privacyLink = document.getElementById("privacyLink");
 const tooltip = document.createElement("div");
 
 let currentHostname = "";
 let currentTabId = null;
 let currentTabTemporary = false;
+let currentTabUrl = "";
 let pageActionsAvailable = false;
 let tooltipTarget = null;
 let settings = sanitizeSettings(DEFAULTS);
+let lastStatusResponse = null;
 
 const SITE_MODE_HINTS = {
   auto: "Auto detect dark pages.",
@@ -77,6 +83,25 @@ function setPageActionsAvailable(isAvailable) {
   }
 
   updateSiteButton();
+}
+
+function isFallbackAvailable(response = lastStatusResponse) {
+  return Boolean(
+    response &&
+      settings.enabled &&
+      pageActionsAvailable &&
+      response.uncertain &&
+      !response.active &&
+      !response.temporary &&
+      currentSiteMode() === "auto"
+  );
+}
+
+function updateFallbackPrompt() {
+  const showFallback = isFallbackAvailable();
+  fallbackPrompt.hidden = !showFallback;
+  fallbackLighten.disabled = !showFallback;
+  fallbackAlways.disabled = !showFallback || !currentHostname;
 }
 
 function updatePresetButtons() {
@@ -245,6 +270,7 @@ function render() {
   updateSiteButton();
   updateSiteModeButtons();
   updateLightenNowButton();
+  updateFallbackPrompt();
   renderAlwaysLightenList();
 }
 
@@ -254,15 +280,30 @@ function statusText(response) {
   if (currentSiteMode() === "on") return "Always lightening this site.";
   if (currentSiteMode() === "off") return "Never lightening this site.";
   if (response.active) return "Auto-lightening this page.";
+  if (response.uncertain) return "Looks dark. Lighten this page?";
   if (response.detectedDark) return "Dark content detected, but not active.";
   if (response.reason?.includes("does not look like a reading surface")) return "Not a reading surface.";
   return response.reason || "No dark reading content found.";
 }
 
-function unavailableStatus() {
+function unavailableText(tab) {
+  const url = tab?.url || currentTabUrl || "";
+
+  if (!url) return "Not available on this page.";
+  if (url.startsWith("chrome://")) return "Chrome pages cannot be changed.";
+  if (url.startsWith("chrome-extension://")) return "Extension pages cannot be changed.";
+  if (/^https:\/\/(chromewebstore|chrome\.google)\.com\//.test(url)) return "Chrome Web Store cannot be changed.";
+  if (/\.pdf([?#]|$)/i.test(url)) return "PDF pages are not supported yet.";
+  if (/^(about|edge|brave|devtools):/i.test(url)) return "Browser pages cannot be changed.";
+
+  return "Refresh this page or reload the extension.";
+}
+
+function unavailableStatus(tab) {
   currentHostname = "";
   currentTabTemporary = false;
-  status.textContent = "Not available on this page.";
+  lastStatusResponse = null;
+  status.textContent = unavailableText(tab);
   setPageActionsAvailable(false);
   render();
 }
@@ -270,24 +311,36 @@ function unavailableStatus() {
 function applyStatusResponse(response) {
   currentHostname = response.hostname;
   currentTabTemporary = response.temporary;
+  lastStatusResponse = response;
   status.textContent = statusText(response);
   setPageActionsAvailable(true);
   render();
 }
 
 function extensionVersionText() {
-  return chrome.runtime.getManifest?.().version || "0.3.0";
+  return chrome.runtime.getManifest?.().version || "0.4.0";
 }
 
 function diagnosticPairs() {
   const mode = currentSiteMode();
+  const signals = lastStatusResponse?.signals || {};
   return [
     ["Version", extensionVersionText()],
     ["Status", status.textContent || "Unknown"],
     ["Host", currentHostname || "Unavailable"],
     ["Enabled", settings.enabled ? "Yes" : "No"],
     ["Site mode", SITE_MODE_LABELS[mode] || mode],
+    ["Detection", lastStatusResponse?.detectionStatus || "Unavailable"],
+    ["Reason", lastStatusResponse?.reason || status.textContent || "Unknown"],
+    ["Score", lastStatusResponse?.score ?? "n/a"],
     ["Temporary", currentTabTemporary ? "Yes" : "No"],
+    ["Target", signals.target || "n/a"],
+    ["Text blocks", signals.textBlocks ?? "n/a"],
+    ["Controls", signals.controls ?? "n/a"],
+    ["Control-heavy", signals.controlHeavy ? "Yes" : "No"],
+    ["Images/textures", signals.imageBackdrop ? "Yes" : "No"],
+    ["Cleanup targets", signals.cleanupTargets ?? 0],
+    ["Control penalty", signals.controlPenalty ?? "n/a"],
     ["Shade", settings.backgroundColor],
     ["Default shade", settings.defaultBackgroundColor]
   ];
@@ -401,14 +454,15 @@ function sendTemporaryMode(mode, afterSend) {
 function updateStatus() {
   chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
     currentTabId = tab?.id || null;
+    currentTabUrl = tab?.url || "";
     if (!currentTabId) {
-      unavailableStatus();
+      unavailableStatus(tab);
       return;
     }
 
     chrome.tabs.sendMessage(currentTabId, { type: MESSAGE_TYPES.status }, (response) => {
       if (chrome.runtime.lastError || !response) {
-        unavailableStatus();
+        unavailableStatus(tab);
         return;
       }
 
@@ -482,8 +536,30 @@ siteModeButtons.addEventListener("click", (event) => {
 lightenNow.addEventListener("click", () => {
   sendTemporaryMode(currentTabTemporary ? "auto" : "on", (response) => {
     currentTabTemporary = response.temporary;
+    lastStatusResponse = response;
     status.textContent = statusText(response);
     render();
+  });
+});
+
+fallbackLighten.addEventListener("click", () => {
+  sendTemporaryMode("on", (response) => {
+    currentTabTemporary = response.temporary;
+    lastStatusResponse = response;
+    status.textContent = statusText(response);
+    render();
+  });
+});
+
+fallbackAlways.addEventListener("click", () => {
+  if (!currentHostname || fallbackAlways.disabled) return;
+
+  const siteModes = sanitizeSiteModes({ ...settings.siteModes, [currentHostname]: "on" });
+  save({ siteModes }, () => {
+    sendTemporaryMode("auto", () => {
+      render();
+      updateStatus();
+    });
   });
 });
 
@@ -537,6 +613,10 @@ optionsMenu.addEventListener("click", (event) => {
     closeMenu();
     chrome.tabs.create({ url: chrome.runtime.getURL("fixtures/index.html") });
   }
+  if (action === "privacy") {
+    closeMenu();
+    chrome.tabs.create({ url: chrome.runtime.getURL("PRIVACY.md") });
+  }
   if (action === "about") openModal("about");
 });
 
@@ -562,6 +642,11 @@ emailSupport.addEventListener("click", () => {
   const subject = encodeURIComponent("Light Reader support");
   const body = encodeURIComponent(`Describe the issue:\n\n\nDiagnostics:\n${diagnosticsText()}`);
   window.location.href = `mailto:?subject=${subject}&body=${body}`;
+});
+
+privacyLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  chrome.tabs.create({ url: chrome.runtime.getURL("PRIVACY.md") });
 });
 
 confirmResetAll.addEventListener("click", resetAllSettings);

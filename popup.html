@@ -10,7 +10,6 @@
     <main class="panel">
       <header class="hero">
         <div class="brand">
-          <img class="brand-mark" src="assets/light-reader-mark.png" alt="">
           <div>
             <h1>Light Reader</h1>
             <p class="status-line">
@@ -29,8 +28,17 @@
         <button type="button" data-menu-action="refresh">Reload page detection</button>
         <button type="button" data-menu-action="reset">Reset all settings</button>
         <button type="button" data-menu-action="fixtures">Open QA guide</button>
+        <button type="button" data-menu-action="privacy">Privacy policy</button>
         <button type="button" data-menu-action="about">About Light Reader</button>
       </div>
+
+      <section id="fallbackPrompt" class="fallback-prompt" hidden>
+        <p>Auto is unsure on this dark page.</p>
+        <div>
+          <button id="fallbackLighten" type="button">Lighten Now</button>
+          <button id="fallbackAlways" type="button">Always</button>
+        </div>
+      </section>
 
       <section class="card site-card">
         <div class="section-heading">
@@ -127,9 +135,11 @@
           <p class="modal-copy">A quiet reading helper that softens dark article pages while keeping site controls in your hands.</p>
           <div class="about-grid">
             <span>Version</span>
-            <strong id="extensionVersion">0.3.0</strong>
+            <strong id="extensionVersion">0.4.0</strong>
             <span>Mode</span>
             <strong id="aboutMode">Auto detect</strong>
+            <span>Privacy</span>
+            <strong><a href="PRIVACY.md" id="privacyLink">View policy</a></strong>
           </div>
         </section>
 

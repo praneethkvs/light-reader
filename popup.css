@@ -77,7 +77,7 @@ p {
   padding: 9px;
   background: linear-gradient(180deg, rgba(255, 253, 248, 0.97), rgba(250, 247, 241, 0.95));
   border: 0.75px solid rgba(28, 28, 28, 0.16);
-  border-radius: 13.5px;
+  border-radius: 0;
   box-shadow: var(--shadow);
 }
 
@@ -103,13 +103,6 @@ p {
 
 .brand > div {
   min-width: 0;
-}
-
-.brand-mark {
-  width: 31.5px;
-  height: 31.5px;
-  object-fit: contain;
-  flex: 0 0 auto;
 }
 
 h1 {
@@ -211,6 +204,49 @@ h1 {
 .menu-popover button:hover,
 .menu-popover button:focus-visible {
   background: #fff4dc;
+  color: #a8550d;
+}
+
+.fallback-prompt {
+  display: grid;
+  gap: 5.25px;
+  padding: 7.5px;
+  border: 0.75px solid rgba(245, 158, 11, 0.26);
+  border-radius: 9px;
+  background: #fff7e8;
+  box-shadow: 0 4.5px 10.5px rgba(64, 53, 34, 0.04);
+}
+
+.fallback-prompt p {
+  color: #5b4630;
+  font-size: 8.75px;
+  font-weight: 650;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.fallback-prompt div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4.5px;
+}
+
+.fallback-prompt button {
+  min-height: 22.5px;
+  border-radius: 999px;
+  font-size: 8.75px;
+  font-weight: 760;
+}
+
+#fallbackLighten {
+  border: 0;
+  background: linear-gradient(135deg, #f7a51a, #ee8500);
+  color: #ffffff;
+}
+
+#fallbackAlways {
+  border: 0.75px solid rgba(245, 158, 11, 0.3);
+  background: rgba(255, 255, 255, 0.74);
   color: #a8550d;
 }
 
@@ -763,7 +799,7 @@ input[type="color"]::-webkit-color-swatch {
 .diagnostics-box div,
 .about-grid {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-columns: 70px minmax(0, 1fr);
   gap: 4.5px;
 }
 
@@ -773,12 +809,22 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .diagnostics-box strong,
-.about-grid strong {
+.about-grid strong,
+.about-grid a {
   overflow: hidden;
   color: var(--ink);
   font-size: inherit;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.about-grid a {
+  color: #b45309;
+  text-decoration: none;
+}
+
+.about-grid a:hover {
+  text-decoration: underline;
 }
 
 .about-grid {
@@ -831,7 +877,7 @@ footer {
   margin: 0 -9px -9px;
   padding: 6.75px 9px 7.5px;
   border-top: 0.75px solid rgba(28, 28, 28, 0.1);
-  border-radius: 0 0 13.5px 13.5px;
+  border-radius: 0;
   background: rgba(255, 255, 255, 0.46);
 }
 

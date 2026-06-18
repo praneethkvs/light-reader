@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="light-reader-expected" content="auto-active">
+    <title>Docs Code Reference Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #0d1117;
+        color: #e6edf3;
+        font-family: system-ui, sans-serif;
+      }
+
+      main {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 48px 24px;
+      }
+
+      p,
+      li {
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      pre {
+        overflow-x: auto;
+        padding: 18px;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        background: #161b22;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>API Reference on a Dark Docs Page</h1>
+      <p>This documentation fixture has enough prose to be readable content while still including code blocks that need to remain legible.</p>
+      <p>Light Reader should improve the page contrast without flattening code into unreadable text.</p>
+      <pre><code>const mode = await reader.detect(page);
+if (mode === "dark-reading") {
+  reader.lightenNow();
+}</code></pre>
+      <p>Long docs pages often mix headings, lists, tables, and examples. The detector should choose the main content rather than small navigation surfaces.</p>
+    </main>
+  </body>
+</html>

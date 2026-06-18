@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="light-reader-expected" content="auto-uncertain">
+    <title>Forum Comments Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #101114;
+        color: #eeeeee;
+        font-family: system-ui, sans-serif;
+      }
+
+      main {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 42px 24px;
+      }
+
+      .comment {
+        margin: 12px 0;
+        padding: 16px;
+        border: 1px solid #2b2f38;
+        background: #181b21;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Discussion Thread</h1>
+      <section class="comment">
+        <p>This is a repeated comment thread with readable dark text blocks, but it also has voting, reply, and moderation controls around every entry.</p>
+        <div class="actions"><button>Upvote</button><button>Reply</button><button>Share</button></div>
+      </section>
+      <section class="comment">
+        <p>The page looks dark and has enough content to be useful, but Auto should be cautious because forum pages are not always pure reading surfaces.</p>
+        <div class="actions"><button>Upvote</button><button>Reply</button><button>Report</button></div>
+      </section>
+      <section class="comment">
+        <p>This fixture is meant to exercise the fallback prompt: Light Reader can offer to lighten it without silently changing the page.</p>
+        <div class="actions"><button>Upvote</button><button>Reply</button><button>Save</button></div>
+      </section>
+    </main>
+  </body>
+</html>

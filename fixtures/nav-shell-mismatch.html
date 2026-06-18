@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="light-reader-expected" content="auto-active">
+    <title>Navigation Shell Mismatch Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #050505;
+        color: #f3f4f6;
+        font-family: system-ui, sans-serif;
+      }
+
+      header {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        padding: 14px 24px;
+      }
+
+      header a,
+      .subnav a {
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      main {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 42px 24px 70px;
+      }
+
+      article {
+        display: grid;
+        gap: 20px;
+      }
+
+      .subnav {
+        display: flex;
+        gap: 16px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        background: #080d12;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 38px;
+        line-height: 1.1;
+        text-align: center;
+      }
+
+      p {
+        font-size: 19px;
+        line-height: 1.6;
+      }
+
+      .plans {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .plan {
+        padding: 18px;
+        border: 1px solid #28303a;
+        background: #0c1117;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="#">Product</a>
+      <a href="#">Solutions</a>
+      <a href="#">Resources</a>
+      <a href="#">Pricing</a>
+    </header>
+    <main>
+      <article>
+        <nav class="subnav" aria-label="Product sections">
+          <a href="#">Overview</a>
+          <a href="#">Features</a>
+          <a href="#">Compare plans</a>
+          <a href="#">FAQ</a>
+        </nav>
+        <h1>Take Flight With a Developer Tool</h1>
+        <p>This fixture mirrors a product pricing page where a top navigation shell has white text over a dark page background.</p>
+        <p>When the page shell is lightened, top navigation text should also become readable instead of staying white on a light surface.</p>
+        <p>The secondary navigation inside the reading area should not keep a dark strip behind darkened text after Light Reader activates.</p>
+        <section class="plans">
+          <div class="plan">
+            <h2>Free</h2>
+            <p>A basic plan card with enough explanatory copy to help the detector find the surrounding content.</p>
+          </div>
+          <div class="plan">
+            <h2>Pro</h2>
+            <p>A second plan card keeps the layout similar to a real pricing page with repeated readable blocks.</p>
+          </div>
+          <div class="plan">
+            <h2>Enterprise</h2>
+            <p>A third plan card adds more prose so the surface remains article-like rather than only app chrome.</p>
+          </div>
+        </section>
+      </article>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="light-reader-expected" content="auto-uncertain">
+    <title>Uncertain Dark Page Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #101113;
+        color: #efefef;
+        font-family: system-ui, sans-serif;
+      }
+
+      main {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 52px 24px;
+      }
+
+      p {
+        font-size: 18px;
+        line-height: 1.55;
+      }
+
+      .tools {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        margin: 20px 0;
+      }
+
+      button {
+        min-height: 34px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Dark Page With Mixed Signals</h1>
+      <p>This page has real prose on a dark background, but it also includes enough controls to make Auto hesitate.</p>
+      <div class="tools">
+        <button>Filter</button>
+        <button>Sort</button>
+        <button>Pin</button>
+        <button>Export</button>
+      </div>
+      <p>The popup should offer Lighten Now and Always instead of silently doing nothing or automatically transforming the page.</p>
+      <p>This gives the user control when the detector sees a dark page but does not have high confidence that it is a normal article.</p>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="light-reader-expected" content="auto-active">
+    <title>Dark News List Fixture</title>
+    <style>
+      body {
+        margin: 0;
+        background: #fafafa;
+        color: #111111;
+        font-family: system-ui, sans-serif;
+      }
+
+      header {
+        padding: 24px 36px;
+        background: #15181c;
+        color: #f3f3f3;
+      }
+
+      main {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 56px 32px;
+      }
+
+      .news-list {
+        display: grid;
+        gap: 36px;
+        background-image:
+          linear-gradient(rgba(7, 8, 10, 0.92), rgba(7, 8, 10, 0.92)),
+          repeating-linear-gradient(45deg, #111820 0 6px, #0d1118 6px 12px);
+      }
+
+      .story {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 28px;
+        padding: 28px;
+        border: 1px solid #262b32;
+        background:
+          linear-gradient(rgba(7, 8, 10, 0.92), rgba(7, 8, 10, 0.92)),
+          repeating-linear-gradient(45deg, #111820 0 6px, #0d1118 6px 12px);
+      }
+
+      .art {
+        min-height: 180px;
+        background: #263647;
+      }
+
+      .copy h2,
+      .copy p {
+        color: #f2f2f2;
+      }
+
+      .copy h2 {
+        margin: 0 0 18px;
+        font-size: 32px;
+        line-height: 1.15;
+      }
+
+      .copy p {
+        font-size: 19px;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <header>Game News</header>
+    <main>
+      <section class="news-list">
+        <article class="story">
+          <div class="art" aria-hidden="true"></div>
+          <div class="copy">
+            <h2>Real-Time Royalty Arrives on macOS</h2>
+            <p>This fixture represents a dark game news listing where the story container has a dark visual treatment, but the readable text color is set on nested copy elements.</p>
+            <p>Light Reader should detect this as dark reading content even though the candidate container itself does not expose a light text color directly.</p>
+            <p>After activation, the story copy should be readable on the selected light background and the nested dark panel should not hide the text.</p>
+          </div>
+        </article>
+        <article class="story">
+          <div class="art" aria-hidden="true"></div>
+          <div class="copy">
+            <h2>A Second Story Keeps the Listing Article-Like</h2>
+            <p>News pages often contain several long excerpts, release dates, sharing controls, product cards, and navigation links around the real prose.</p>
+            <p>The detector should tolerate that structure when there are still multiple substantial visible paragraphs in a central dark reading area.</p>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
